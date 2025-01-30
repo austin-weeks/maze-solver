@@ -1,4 +1,5 @@
 from tkinter import Tk, BOTH, Canvas
+from shapes import *
 
 class Window():
     def __init__(self, width, height):
@@ -16,9 +17,16 @@ class Window():
         self.root.update()
 
     def wait_for_close(self):
+        """
+        Main method for starting the window.
+        Drawing lines should be performed before calling this method.
+        """
         self.running = True
         while self.running:
             self.redraw()
     
     def close(self):
         self.running = False
+
+    def draw_line(self, line: Line, fill_color: str):
+        line.draw(self.canvas, fill_color)
