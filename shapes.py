@@ -8,13 +8,13 @@ class Point():
         
 
 class Line():
-    __stroke_width = 2
+    _stroke_width = 2
     def __init__(self, point_a: Point, point_b: Point):
         self.a = point_a
         self.b = point_b
     
     def draw(self, canvas: Canvas, fill_color: str):
         canvas.create_line(
-            self.a.x, self.a.y, self.b.x, self.b.y, fill=fill_color, width=self.__stroke_width
+            self.a.x, self.a.y, self.b.x, self.b.y, fill=fill_color, width=self._stroke_width
         )
         
