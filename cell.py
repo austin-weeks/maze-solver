@@ -9,7 +9,7 @@ class Cell():
         x2: int,
         y1: int,
         y2: int,
-        window: Window,
+        window: Window | None = None,
         color: str = None
     ):
         self._x1 = x1
@@ -45,6 +45,8 @@ class Cell():
         )
     
     def draw_move(self, other: 'Cell', undo=False):
+        if not self.window:
+            return
         color = "red" if not undo else "gray"
         self.window.draw_line(
             Line(self.center(), other.center()),
