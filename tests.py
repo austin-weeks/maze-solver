@@ -11,8 +11,14 @@ class Tests(unittest.TestCase):
 
     def test_create_entrance_exit(self):
         maze = Maze(0, 0, 5, 5, 10, 10)
-        self.assertFalse(maze._cells[0][0].bottom_wall)
-        self.assertFalse(maze._cells[-1][-1].top_wall)
+        self.assertFalse(maze._cells[0][0].top_wall)
+        self.assertFalse(maze._cells[-1][-1].bottom_wall)
+
+    def test_reset_cells_visit(self):
+        maze = Maze(0, 0, 5, 5, 10, 10)
+        for i in range(maze.num_cols):
+            for j in range(maze.num_rows):
+                self.assertFalse(maze._cells[i][j].visited)
 
 if __name__ == "__main__":
     unittest.main()
