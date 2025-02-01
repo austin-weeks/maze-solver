@@ -23,6 +23,8 @@ class Cell():
         self.top_wall = True
         self.bottom_wall = True
 
+        self.visited = False
+
         self.fill_color = color if color else self._default_color
         self.no_color = self.window.root.cget("background") if self.window else "white"
 
