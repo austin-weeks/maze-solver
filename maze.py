@@ -125,3 +125,60 @@ class Maze():
         for row in self._cells:
             for cell in row:
                 cell.visited = False
+
+    def solve(self, method: str = "dfs") -> bool:
+        """
+        Solve the maze with the given method.
+        Options:
+        "dfs" - depth-first search (default)
+        "bfs" - breadth-first search
+        "a*" - A* pathfinding
+        """
+        match method:
+            case "dfs": return self._solve_dfs(0, 0)
+            case "bfs": return self._solve_bfs()
+            case "a*": return self._solve_a_star()
+        raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', or 'a*'.")
+    
+    def _solve_dfs(self, c: int, r: int):
+        self._animate()
+        cell = self._cells[c][r]
+        cell.visited = True
+        if cell is self._cells[-1][-1]:
+            return True
+        for next_c, next_r in self._get_neighbors(c, r):
+            neighbor = self._cells[next_c][next_r]
+            if neighbor.visited:
+                continue
+            cell.draw_move(neighbor)
+            if self._solve_dfs(next_c, next_r):
+                return True
+            else:
+                cell.draw_move(neighbor, undo=True)
+        return False
+    
+    def _solve_bfs(self) -> bool:
+        pass
+    
+    def _solve_a_star(self) -> bool:
+        pass
+
+    def _get_neighbors(self, c: int, r: int) -> list[tuple[int, int]]:
+        def in_bounds(i, j):
+            if i < 0 or j < 0:
+                return False
+            if i >= len(self._cells) or j >= len(self._cells[0]):
+                return False
+            return True
+        cell = self._cells[c][r]
+        neighbors: list[tuple[int, int]] = []
+        # we do bottom and right first, as the maze goes from top left to bottom right
+        if not cell.bottom_wall and in_bounds(c, r + 1):
+            neighbors.append((c, r + 1))
+        if not cell.right_wall and in_bounds(c + 1, r):
+            neighbors.append((c + 1, r))
+        if not cell.top_wall and in_bounds(c, r - 1):
+            neighbors.append((c, r - 1))
+        if not cell.left_wall and in_bounds(c - 1, r):
+            neighbors.append((c - 1, r))
+        return neighbors
