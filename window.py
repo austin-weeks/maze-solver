@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import Tk, Canvas
 from shapes import *
 
 class Window():

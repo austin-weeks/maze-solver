@@ -20,5 +20,17 @@ class Tests(unittest.TestCase):
             for j in range(maze.num_rows):
                 self.assertFalse(maze._cells[i][j].visited)
 
+    def test_dfs(self):
+        maze = Maze(0, 0, 10, 10, 5, 5)
+        self.assertTrue(maze.solve("dfs"))
+
+    def test_bfs(self):
+        maze = Maze(0, 0, 10, 10, 5, 5)
+        self.assertTrue(maze.solve("bfs"))
+
+    def test_a_star(self):
+        maze = Maze(0, 0, 10, 10, 5, 5)
+        self.assertTrue(maze.solve("a*"))
+
 if __name__ == "__main__":
     unittest.main()

@@ -6,7 +6,6 @@ class Point():
     x: int
     y: int
         
-
 class Line():
     _stroke_width = 2
     def __init__(self, point_a: Point, point_b: Point):

@@ -9,6 +9,8 @@ class Cell():
         x2: int,
         y1: int,
         y2: int,
+        col_ind: int,
+        row_ind: int,
         window: Window | None = None,
         color: str = None
     ):
@@ -16,6 +18,10 @@ class Cell():
         self._x2 = x2
         self._y1 = y1
         self._y2 = y2
+
+        self.col_ind = col_ind
+        self.row_ind = row_ind
+
         self.window = window
         
         self.left_wall = True

@@ -2,6 +2,7 @@ from cell import Cell
 from shapes import *
 from window import Window
 import time, random
+from collections import deque
 
 ANIMATION_DELAY = 0.005
 
@@ -44,11 +45,13 @@ class Maze():
             for r in range(self.num_rows):
                 y = self.y1 + (self.cell_size_y * r)
                 cell = Cell(
-                    x,
-                    x + self.cell_size_x,
-                    y,
-                    y + self.cell_size_y,
-                    self.window,
+                    x1=x,
+                    x2=x + self.cell_size_x,
+                    y1=y,
+                    y2=y + self.cell_size_y,
+                    col_ind=c,
+                    row_ind=r,
+                    window=self.window,
                     color=None
                 )
                 self._draw_cell(cell)
@@ -128,57 +131,84 @@ class Maze():
 
     def solve(self, method: str = "dfs") -> bool:
         """
-        Solve the maze with the given method.
-        Options:
-        "dfs" - depth-first search (default)
-        "bfs" - breadth-first search
-        "a*" - A* pathfinding
+        Solve the maze with the given method.\n
+        Options:\n
+        "dfs" - depth-first search (default)\n
+        "bfs" - breadth-first search\n
+        "a*" - A* pathfinding\n
         """
         match method:
-            case "dfs": return self._solve_dfs(0, 0)
+            case "dfs": return self._solve_dfs(self._cells[0][0])
             case "bfs": return self._solve_bfs()
             case "a*": return self._solve_a_star()
         raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', or 'a*'.")
     
-    def _solve_dfs(self, c: int, r: int):
+    def _solve_dfs(self, cell: Cell) -> bool:
         self._animate()
-        cell = self._cells[c][r]
         cell.visited = True
         if cell is self._cells[-1][-1]:
             return True
-        for next_c, next_r in self._get_neighbors(c, r):
-            neighbor = self._cells[next_c][next_r]
+        for neighbor in self._get_neighbors(cell):
             if neighbor.visited:
                 continue
             cell.draw_move(neighbor)
-            if self._solve_dfs(next_c, next_r):
+            if self._solve_dfs(neighbor):
                 return True
             else:
                 cell.draw_move(neighbor, undo=True)
         return False
     
     def _solve_bfs(self) -> bool:
-        pass
+        to_visit = deque([self._cells[0][0]])
+        parents: dict[Cell, Cell] = {}
+        while to_visit:
+            self._animate()
+            cell = to_visit.popleft()
+            if cell.visited:
+                continue
+            cell.visited = True
+            if cell in parents:
+                parent = parents[cell]
+                parent.draw_move(cell, undo=True)
+
+            if cell is self._cells[-1][-1]:
+                solution: list[Cell] = []
+                cur = cell
+                while cur in parents:
+                    solution.append(cur)
+                    cur = parents[cur]
+                solution.append(self._cells[0][0])
+                solution.reverse()
+                for i in range(1, len(solution)):
+                    self._animate()
+                    solution[i - 1].draw_move(solution[i])
+                return True
+            
+            neighbors = [n for n in self._get_neighbors(cell) if not n.visited]
+            for neighbor in neighbors:
+                parents[neighbor] = cell
+                to_visit.append(neighbor)
+        return False
     
     def _solve_a_star(self) -> bool:
         pass
 
-    def _get_neighbors(self, c: int, r: int) -> list[tuple[int, int]]:
-        def in_bounds(i, j):
-            if i < 0 or j < 0:
+    def _get_neighbors(self, cell: Cell) -> list[Cell]:
+        def in_bounds(c, r):
+            if c < 0 or r < 0:
                 return False
-            if i >= len(self._cells) or j >= len(self._cells[0]):
+            if c >= len(self._cells) or r >= len(self._cells[0]):
                 return False
             return True
-        cell = self._cells[c][r]
-        neighbors: list[tuple[int, int]] = []
+        neighbors: list[Cell] = []
         # we do bottom and right first, as the maze goes from top left to bottom right
+        c, r = cell.col_ind, cell.row_ind
         if not cell.bottom_wall and in_bounds(c, r + 1):
-            neighbors.append((c, r + 1))
+            neighbors.append(self._cells[c][r + 1])
         if not cell.right_wall and in_bounds(c + 1, r):
-            neighbors.append((c + 1, r))
+            neighbors.append(self._cells[c + 1][r])
         if not cell.top_wall and in_bounds(c, r - 1):
-            neighbors.append((c, r - 1))
+            neighbors.append(self._cells[c][r - 1])
         if not cell.left_wall and in_bounds(c - 1, r):
-            neighbors.append((c - 1, r))
+            neighbors.append(self._cells[c - 1][r])
         return neighbors
