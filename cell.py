@@ -1,8 +1,9 @@
 from shapes import *
 from window import Window
 
+WALL_WIDTH = 2
+WALL_COLOR = "#171717"
 class Cell():
-    _default_color = "black"
     def __init__(
         self,
         x1: int,
@@ -31,36 +32,37 @@ class Cell():
 
         self.visited = False
 
-        self.fill_color = color if color else self._default_color
+        self.fill_color = color if color else WALL_COLOR
         self.no_color = self.window.root.cget("background") if self.window else "white"
 
     def draw(self):
-        self._draw_line(self._x1, self._y1, self._x1, self._y2,
+        self._draw_wall(self._x1, self._y1, self._x1, self._y2,
             self.fill_color if self.left_wall else self.no_color
         )
-        self._draw_line(self._x2, self._y1, self._x2, self._y2,
+        self._draw_wall(self._x2, self._y1, self._x2, self._y2,
             self.fill_color if self.right_wall else self.no_color
         )
-        self._draw_line(self._x1, self._y1, self._x2, self._y1,
+        self._draw_wall(self._x1, self._y1, self._x2, self._y1,
             self.fill_color if self.top_wall else self.no_color
         )
-        self._draw_line(self._x1, self._y2, self._x2, self._y2,
+        self._draw_wall(self._x1, self._y2, self._x2, self._y2,
             self.fill_color if self.bottom_wall else self.no_color
         )
     
-    def _draw_line(self, p1_x, p1_y, p2_x, p2_y, color: str):
+    def _draw_wall(self, p1_x, p1_y, p2_x, p2_y, color: str):
         self.window.draw_line(
             Line(
                 Point(p1_x, p1_y),
                 Point(p2_x, p2_y)
             ),
-            color
+            color,
+            stroke_width=WALL_WIDTH
         )
     
     def draw_move(self, other: 'Cell', undo=False):
         if not self.window:
             return
-        color = "red" if not undo else "gray"
+        color = "#6366f1" if not undo else "#71717a"
         self.window.draw_line(
             Line(self.center(), other.center()),
             color
@@ -71,3 +73,8 @@ class Cell():
             (self._x1 + self._x2) // 2,
             (self._y1 + self._y2) // 2
         )
+    
+    def __lt__(self, other):
+        if not isinstance(other, Cell):
+            return False
+        return True

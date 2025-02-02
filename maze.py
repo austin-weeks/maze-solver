@@ -3,6 +3,7 @@ from shapes import *
 from window import Window
 import time, random
 from collections import deque
+import heapq
 
 ANIMATION_DELAY = 0.005
 
@@ -17,7 +18,8 @@ class Maze():
         cell_size_y: int,
         window: Window | None = None,
         seed: int | None = None,
-        animation_step_time: int = ANIMATION_DELAY
+        maze_creation_animation_time: int = ANIMATION_DELAY,
+        maze_solving_animation_time: int = ANIMATION_DELAY * 2
     ):
         self.x1 = x1
         self.y1 = y1
@@ -26,7 +28,8 @@ class Maze():
         self.cell_size_x = cell_size_x
         self.cell_size_y = cell_size_y
         self.window = window
-        self._animation_delay = animation_step_time
+        self._create_anim_delay = maze_creation_animation_time
+        self._solve_anim_delay = maze_solving_animation_time
         self._cells: list[list[Cell]] = []
 
         if seed:
@@ -63,13 +66,13 @@ class Maze():
         if not self.window:
             return
         cell.draw()
-        self._animate()
+        self._animate(self._create_anim_delay)
 
-    def _animate(self):
+    def _animate(self, delay: float):
         if not self.window:
             return
         self.window.redraw()
-        time.sleep(self._animation_delay)
+        time.sleep(delay)
 
     def _break_entrance_and_exit(self):
         entrance = self._cells[0][0]
@@ -141,10 +144,11 @@ class Maze():
             case "dfs": return self._solve_dfs(self._cells[0][0])
             case "bfs": return self._solve_bfs()
             case "a*": return self._solve_a_star()
-        raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', or 'a*'.")
+            case "djikstra": return self._solve_djikstra()
+        raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', 'djikstra' or 'a*'.")
     
     def _solve_dfs(self, cell: Cell) -> bool:
-        self._animate()
+        self._animate(self._solve_anim_delay)
         cell.visited = True
         if cell is self._cells[-1][-1]:
             return True
@@ -162,7 +166,7 @@ class Maze():
         to_visit = deque([self._cells[0][0]])
         parents: dict[Cell, Cell] = {}
         while to_visit:
-            self._animate()
+            self._animate(self._solve_anim_delay)
             cell = to_visit.popleft()
             if cell.visited:
                 continue
@@ -180,7 +184,7 @@ class Maze():
                 solution.append(self._cells[0][0])
                 solution.reverse()
                 for i in range(1, len(solution)):
-                    self._animate()
+                    self._animate(self._solve_anim_delay)
                     solution[i - 1].draw_move(solution[i])
                 return True
             
@@ -190,8 +194,43 @@ class Maze():
                 to_visit.append(neighbor)
         return False
     
+    def _solve_djikstra(self) -> bool:
+        pq = [(0, self._cells[0][0])] # (distance, cell)
+        parents: dict[Cell, Cell] = {}
+        distances = {self._cells[0][0]: 0}
+        while pq:
+            _, cell = heapq.heappop(pq) # here we need to get the min distance node
+            if cell.visited:
+                print('cell has already been visited')
+                continue
+            cell.visited = True
+            if cell in parents:
+                self._animate(self._solve_anim_delay)
+                parents[cell].draw_move(cell, undo=True)
+            if cell is self._cells[-1][-1]: # we found the end, let's draw the correct path
+                path = []
+                cur = cell
+                while cur in parents:
+                    path.append(cur)
+                    cur = parents[cur]
+                path.append(self._cells[0][0])
+                path.reverse()
+                for i in range(1, len(path)):
+                    self._animate(self._solve_anim_delay)
+                    path[i -1].draw_move(path[i])
+                return True
+            neighbors = [n for n in self._get_neighbors(cell) if not n.visited]
+            for neighbor in neighbors:
+                new_dist = distances[cell] + 1
+                if neighbor not in distances or new_dist < distances[neighbor]:
+                    parents[neighbor] = cell
+                    distances[neighbor] = new_dist
+                    heapq.heappush(pq, (new_dist, neighbor))
+        return False
+            
+
     def _solve_a_star(self) -> bool:
-        pass
+        return False
 
     def _get_neighbors(self, cell: Cell) -> list[Cell]:
         def in_bounds(c, r):
