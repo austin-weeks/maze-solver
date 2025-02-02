@@ -6,14 +6,15 @@ class Point():
     x: int
     y: int
         
+STROKE_WIDTH = 2
 class Line():
-    _stroke_width = 2
-    def __init__(self, point_a: Point, point_b: Point):
+    def __init__(self, point_a: Point, point_b: Point, stroke_width: int | None = None):
         self.a = point_a
         self.b = point_b
-    
-    def draw(self, canvas: Canvas, fill_color: str):
+        self._stroke_width = stroke_width if stroke_width else STROKE_WIDTH
+
+    def draw(self, canvas: Canvas, fill_color: str, stroke_width: int | None = None):
         canvas.create_line(
-            self.a.x, self.a.y, self.b.x, self.b.y, fill=fill_color, width=self._stroke_width
+            self.a.x, self.a.y, self.b.x, self.b.y, fill=fill_color, width=stroke_width if stroke_width else self._stroke_width 
         )
         

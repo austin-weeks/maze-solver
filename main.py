@@ -1,5 +1,6 @@
 from window import *
 from maze import Maze
+import time
 
 def main():
     width = 1080
@@ -15,11 +16,13 @@ def main():
         cell_size_x=cell_size,
         cell_size_y=cell_size,
         window=window,
-        animation_step_time=0.001
+        maze_creation_animation_time=0,
+        maze_solving_animation_time=0.003,
     )
+    time.sleep(0.5)
 
     # choose your solver method here
-    solved = maze.solve("bfs")
+    solved = maze.solve("djikstra")
 
     print(("Maze was solved!" if solved else "Maze could not be solved :("))
 

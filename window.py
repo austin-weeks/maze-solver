@@ -1,6 +1,8 @@
 from tkinter import Tk, Canvas
 from shapes import *
 
+BACKGROUND_COLOR = "#52525b"
+
 class Window():
     def __init__(self, width: int, height: int):
         self.root = Tk()
@@ -8,7 +10,8 @@ class Window():
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.width = width
         self.height = height
-        self.canvas = Canvas(height=height, width=width)
+        self.root.configure(background=BACKGROUND_COLOR)
+        self.canvas = Canvas(height=height, width=width, background=BACKGROUND_COLOR)
         self.canvas.pack()
 
         self.running = False
@@ -29,5 +32,5 @@ class Window():
     def close(self):
         self.running = False
 
-    def draw_line(self, line: Line, fill_color: str):
-        line.draw(self.canvas, fill_color)
+    def draw_line(self, line: Line, fill_color: str, stroke_width: int = None):
+        line.draw(self.canvas, fill_color, stroke_width)
