@@ -7,7 +7,7 @@ def main():
     height = 720
     window = Window(width, height)
 
-    cell_size = 20
+    cell_size = 40
     maze = Maze(
         x1=5,
         y1=5,
