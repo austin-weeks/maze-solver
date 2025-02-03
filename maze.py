@@ -34,6 +34,8 @@ class Maze():
         self._generate_anim_delay = maze_creation_animation_time
         self._solve_anim_delay = maze_solving_animation_time
         self.cells: list[list[Cell]] = []
+        self.start: Cell = None
+        self.end: Cell = None
 
         if seed:
             random.seed(seed)
@@ -79,10 +81,12 @@ class Maze():
 
     def _break_entrance_and_exit(self):
         entrance = self.cells[0][0]
+        self.start = entrance
         entrance.top_wall = False
         self._draw_cell(entrance)
 
         exit_cell = self.cells[-1][-1]
+        self.end = exit_cell
         exit_cell.bottom_wall = False
         self._draw_cell(exit_cell)
 

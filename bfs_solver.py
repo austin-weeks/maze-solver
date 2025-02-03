@@ -5,25 +5,24 @@ if TYPE_CHECKING:
     from maze import Maze
 
 def solve_bfs(maze: 'Maze') -> bool:
-    to_visit = deque([maze.cells[0][0]])
-    parents: dict[Cell, Cell] = {}
+    to_visit = deque([maze.start])
+    parents: dict[Cell, Cell] = {maze.start: None}
     while to_visit:
         maze.animate()
         cell = to_visit.popleft()
         if cell.visited:
             continue
         cell.visited = True
-        if cell in parents:
+        if cell in parents and parents[cell]:
             parent = parents[cell]
             parent.draw_move(cell, undo=True)
 
-        if cell is maze.cells[-1][-1]:
+        if cell is maze.end:
             solution: list[Cell] = []
             cur = cell
-            while cur in parents:
+            while cur:
                 solution.append(cur)
                 cur = parents[cur]
-            solution.append(maze.cells[0][0])
             solution.reverse()
             for i in range(1, len(solution)):
                 maze.animate()

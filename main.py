@@ -3,11 +3,11 @@ from maze import Maze
 import time
 
 def main():
-    width = 1080
+    width = 1280
     height = 720
     window = Window(width, height)
 
-    cell_size = 47
+    cell_size = 20
     maze = Maze(
         x1=5,
         y1=5,
@@ -22,7 +22,7 @@ def main():
     time.sleep(0.5)
 
     # choose your solver method here
-    solved = maze.solve("djikstra")
+    solved = maze.solve("a*")
 
     print(("Maze was solved!" if solved else "Maze could not be solved :("))
 

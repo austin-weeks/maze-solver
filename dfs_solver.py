@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 def solve_dfs(maze: 'Maze', cell: 'Cell') -> bool:
     maze.animate()
     cell.visited = True
-    if cell is maze.cells[-1][-1]:
+    if cell is maze.end:
         return True
     for neighbor in maze.get_neighbors(cell):
         if neighbor.visited:

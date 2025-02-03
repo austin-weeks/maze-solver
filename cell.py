@@ -77,4 +77,4 @@ class Cell():
     def __lt__(self, other):
         if not isinstance(other, Cell):
             return False
-        return True
+        return (self.col_ind, self.row_ind) < (other.col_ind, other.row_ind)

@@ -5,25 +5,25 @@ if TYPE_CHECKING:
     from maze import Maze
 
 def solve_djikstra(maze: 'Maze') -> bool:
-    pq = [(0, maze.cells[0][0])] # (distance, cell)
-    parents: dict[Cell, Cell] = {}
-    distances = {maze.cells[0][0]: 0}
+    pq: list[tuple[int, Cell]] = [] # (distance, cell)
+    heappush(pq, (0, maze.start)) 
+    parents: dict[Cell, Cell] = {maze.start: None}
+    distances = {maze.start: 0}
     while pq:
         _, cell = heappop(pq) # here we need to get the min distance node
         if cell.visited:
             print('cell has already been visited')
             continue
         cell.visited = True
-        if cell in parents:
+        if cell in parents and parents[cell]:
             maze.animate()
             parents[cell].draw_move(cell, undo=True)
-        if cell is maze.cells[-1][-1]: # we found the end, let's draw the correct path
+        if cell is maze.end: # we found the end, let's draw the correct path
             path = []
             cur = cell
-            while cur in parents:
+            while cur:
                 path.append(cur)
                 cur = parents[cur]
-            path.append(maze.cells[0][0])
             path.reverse()
             for i in range(1, len(path)):
                 maze.animate()
