@@ -7,7 +7,7 @@ def main():
     height = 720
     window = Window(width, height)
 
-    cell_size = 40
+    cell_size = 5
     maze = Maze(
         x1=5,
         y1=5,
@@ -17,12 +17,13 @@ def main():
         cell_size_y=cell_size,
         window=window,
         maze_creation_animation_time=0,
-        maze_solving_animation_time=0.003,
+        maze_solving_animation_time=0,
+        seed=12345
     )
     time.sleep(0.5)
 
     # choose your solver method here
-    solved = maze.solve("a*")
+    solved = maze.solve("dfs")
 
     print(("Maze was solved!" if solved else "Maze could not be solved :("))
 

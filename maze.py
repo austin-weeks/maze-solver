@@ -9,6 +9,7 @@ from dijkstra_solver import solve_dijkstra
 from astar_solver import solve_a_star
 
 ANIMATION_DELAY = 0.005
+ANIMATION_FREQ = 50 # draw only ever x steps
 
 class Maze():
     def __init__(
@@ -33,6 +34,7 @@ class Maze():
         self.window = window
         self._generate_anim_delay = maze_creation_animation_time
         self._solve_anim_delay = maze_solving_animation_time
+        self._anim_step = 0
         self.cells: list[list[Cell]] = []
         self.start: Cell = None
         self.end: Cell = None
@@ -42,7 +44,7 @@ class Maze():
 
         self._create_cells()
         self._break_entrance_and_exit()
-        self._break_walls_r(0, 0)
+        self._break_walls()
         self._reset_cells_visited()
 
     def _create_cells(self):
@@ -74,10 +76,18 @@ class Maze():
         self.animate(generating=True)
 
     def animate(self, generating: bool = False):
+        freq = ANIMATION_FREQ if generating else ANIMATION_FREQ // 3
+        if self._anim_step < freq:
+            self._anim_step += 1
+            return
+        else:
+            self._anim_step = 0
         if not self.window:
             return
         self.window.redraw()
-        time.sleep(self._generate_anim_delay if generating else self._solve_anim_delay)
+        delay = self._generate_anim_delay if generating else self._solve_anim_delay
+        if delay > 0:
+            time.sleep(delay)
 
     def _break_entrance_and_exit(self):
         entrance = self.cells[0][0]
@@ -89,27 +99,28 @@ class Maze():
         self.end = exit_cell
         exit_cell.bottom_wall = False
         self._draw_cell(exit_cell)
-
     
-    def _break_walls_r(self, c: int, r: int):
-        cell = self.cells[c][r]
-        cell.visited = True
-        while True:
-            neighbors: list[tuple[int, int, str]] = []
-            if self._cell_can_visit(c, r - 1):
-                neighbors.append((c, r - 1, "up"))
-            if self._cell_can_visit(c, r + 1):
-                neighbors.append((c, r + 1, "down"))
-            if self._cell_can_visit(c - 1, r):
-                neighbors.append((c - 1, r, "left"))
-            if self._cell_can_visit(c + 1, r):
-                neighbors.append((c + 1, r, "right"))
+    def _break_walls(self):
+        stack = [self.start]
+        while stack:
+            cell = stack.pop()
+            cell.visited = True
+            c, r = cell.col_ind, cell.row_ind
+            neighbors: list[tuple[Cell, str]] = []
+            if self._in_bounds(c, r - 1):
+                neighbors.append((self.cells[c][r - 1], "up"))
+            if self._in_bounds(c, r + 1):
+                neighbors.append((self.cells[c][r + 1], "down"))
+            if self._in_bounds(c - 1, r):
+                neighbors.append((self.cells[c - 1][r], "left"))
+            if self._in_bounds(c + 1, r):
+                neighbors.append((self.cells[c + 1][r], "right"))
+            neighbors = [n for n in neighbors if not n[0].visited]
 
-            if not neighbors:
+            if not neighbors: # reached a dead end
                 self._draw_cell(cell)
-                return
-            next_c, next_r, direction = neighbors.pop(random.randint(0, len(neighbors) - 1))
-            next_cell = self.cells[next_c][next_r]
+                continue
+            next_cell, direction = neighbors.pop(random.randint(0, len(neighbors) - 1))
             if direction == "up":
                 cell.top_wall = False
                 next_cell.bottom_wall = False
@@ -123,16 +134,8 @@ class Maze():
                 cell.right_wall = False
                 next_cell.left_wall = False
             self._draw_cell(cell)
-            self._break_walls_r(next_c, next_r)
-
-    def _cell_can_visit(self, c: int, r: int):
-        if c < 0 or r < 0:
-            return False
-        if c >= len(self.cells) or r >= len(self.cells[0]):
-            return False
-        if self.cells[c][r].visited:
-            return False
-        return True
+            stack.append(cell)
+            stack.append(next_cell)
 
     def _reset_cells_visited(self):
         for row in self.cells:
@@ -154,22 +157,23 @@ class Maze():
             case "a*": return solve_a_star(self)
         raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', 'dijkstra' or 'a*'.")
         
+    def _in_bounds(self, c, r):
+        if c < 0 or r < 0:
+            return False
+        if c >= len(self.cells) or r >= len(self.cells[0]):
+            return False
+        return True
+        
     def get_neighbors(self, cell: Cell) -> list[Cell]:
-        def in_bounds(c, r):
-            if c < 0 or r < 0:
-                return False
-            if c >= len(self.cells) or r >= len(self.cells[0]):
-                return False
-            return True
         neighbors: list[Cell] = []
         # we do bottom and right first, as the maze goes from top left to bottom right
         c, r = cell.col_ind, cell.row_ind
-        if not cell.bottom_wall and in_bounds(c, r + 1):
+        if not cell.bottom_wall and self._in_bounds(c, r + 1):
             neighbors.append(self.cells[c][r + 1])
-        if not cell.right_wall and in_bounds(c + 1, r):
+        if not cell.right_wall and self._in_bounds(c + 1, r):
             neighbors.append(self.cells[c + 1][r])
-        if not cell.top_wall and in_bounds(c, r - 1):
+        if not cell.top_wall and self._in_bounds(c, r - 1):
             neighbors.append(self.cells[c][r - 1])
-        if not cell.left_wall and in_bounds(c - 1, r):
+        if not cell.left_wall and self._in_bounds(c - 1, r):
             neighbors.append(self.cells[c - 1][r])
         return neighbors
