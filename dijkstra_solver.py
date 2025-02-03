@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from cell import Cell
     from maze import Maze
 
-def solve_djikstra(maze: 'Maze') -> bool:
+def solve_dijkstra(maze: 'Maze') -> bool:
     pq: list[tuple[int, Cell]] = [] # (distance, cell)
     heappush(pq, (0, maze.start)) 
     parents: dict[Cell, Cell] = {maze.start: None}

@@ -1,6 +1,6 @@
 # Maze Generator & Solver
 
-A maze generator and solver built with Python and the tkinter GUI library. A fun little project for visuzalizing pathfinding algorithms. Includes dfs, bfs, djikstra's, and a* solvers. The project is a bit rough around the edges :)
+A maze generator and solver built with Python and the tkinter GUI library. A fun little project for visuzalizing pathfinding algorithms. Includes Depth-First Search, Breadth-First Search, Dijkstra's, and A* solvers. The project is a bit rough around the edges :)
 
 <picture>
     <img src="preview.gif" style="display: block; margin: auto; max-width: 720px">

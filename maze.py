@@ -5,7 +5,7 @@ import time, random
 
 from dfs_solver import solve_dfs
 from bfs_solver import solve_bfs
-from djikstra_solver import solve_djikstra
+from dijkstra_solver import solve_dijkstra
 from astar_solver import solve_a_star
 
 ANIMATION_DELAY = 0.005
@@ -150,9 +150,9 @@ class Maze():
         match method:
             case "dfs": return solve_dfs(self, self.cells[0][0])
             case "bfs": return solve_bfs(self)
-            case "djikstra": return solve_djikstra(self)
+            case "dijkstra": return solve_dijkstra(self)
             case "a*": return solve_a_star(self)
-        raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', 'djikstra' or 'a*'.")
+        raise ValueError(f"Maze lacks a '{method}' solver. Please use 'dfs', 'bfs', 'dijkstra' or 'a*'.")
         
     def get_neighbors(self, cell: Cell) -> list[Cell]:
         def in_bounds(c, r):

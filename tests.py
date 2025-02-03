@@ -28,9 +28,9 @@ class Tests(unittest.TestCase):
         maze = Maze(0, 0, 10, 10, 5, 5)
         self.assertTrue(maze.solve("bfs"))
 
-    def test_djikstras(self):
+    def test_dijkstras(self):
         maze = Maze(0, 0, 10, 10, 5, 5)
-        self.assertTrue(maze.solve("djikstra"))
+        self.assertTrue(maze.solve("dijkstra"))
 
     def test_a_star(self):
         maze = Maze(0, 0, 10, 10, 5, 5)
